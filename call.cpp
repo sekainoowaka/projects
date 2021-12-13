@@ -1,7 +1,5 @@
 #include "dlist.h"
 #include <iostream>
-#include <sstream>
-#include <cstdlib>
 
 using namespace std;
 
@@ -13,7 +11,6 @@ struct Event{
     string name;
     Status stat;
     int duration;
-    int answered_at_tick=-1;
     bool is_calling = false;
     bool is_answered = false;
 };
@@ -51,8 +48,9 @@ int main() {
         }
         allMbr.insertBack(newEvent);
         // in insertBack, new memory space is allocated
-        // so after insertion, new Event is dangling
-        delete newEvent;
+        // but after insertion, new Event is not dangling
+        // since the new node created is /pointing to/ the newEvent!!!
+        // delete newEvent; is wrong
     }
 
     ////discrete event simulation
@@ -86,7 +84,6 @@ int main() {
                         break;
                 }
             }
-            delete allTmp;
         }
         allMbr = allMbr_tmp; // this is the rest of the queue
         while (!allMbr_tmp.isEmpty()) {
@@ -101,8 +98,8 @@ int main() {
             } else if (pCount == pTmp->duration) {
                 pCount = 0;
                 is_answering = false;
+                delete pTmp; // ?
             } else platinumMbr_tmp.insertBack(pTmp);
-            delete pTmp;
         }
         platinumMbr = platinumMbr_tmp;
         while(!platinumMbr_tmp.isEmpty()){
@@ -117,9 +114,9 @@ int main() {
 //            } else if (pCount == pTmp->duration) {
 //                pCount = 0;
 //                is_answering = false;
+//                delete pTmp;
 //            }
-//            delete pTmp;
-//        } // makes it not a queue?
+//        } // makes this not a queue?
 
         while (!goldMbr.isEmpty()) {
             Event *gTmp = goldMbr.removeFront();
@@ -129,6 +126,7 @@ int main() {
             } else if (gCount == gTmp->duration) {
                 gCount = 0;
                 is_answering = false;
+                delete gTmp;
             } else goldMbr_tmp.insertBack(gTmp);
         }
         goldMbr = goldMbr_tmp;
@@ -144,6 +142,7 @@ int main() {
             } else if (sCount == sTmp->duration) {
                 sCount = 0;
                 is_answering = false;
+                delete sTmp;
             } else silverMbr_tmp.insertBack(sTmp);
         }
         silverMbr = silverMbr_tmp;
@@ -159,6 +158,7 @@ int main() {
             } else if (rCount == rTmp->duration) {
                 rCount = 0;
                 is_answering = false;
+                delete rTmp;
             } else regularMbr_tmp.insertBack(rTmp);
         }
         regularMbr = regularMbr_tmp;
