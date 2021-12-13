@@ -12,8 +12,6 @@ struct Event{
     Status stat;
     int duration;
     int count = 0;
-//    bool call = false;
-//    bool answer = false;
 };
 
 int main() {
@@ -32,10 +30,6 @@ int main() {
     Dlist<Event> allMbr;
     Dlist<Event> allMbr_tmp;
 
-//    int pCount = 0;
-//    int gCount = 0;
-//    int sCount = 0;
-//    int rCount = 0;
     bool occupied = false;
 
     ////read file input, and insert into call members
@@ -48,10 +42,6 @@ int main() {
             // if strings are equal, then assign the corresponding jth enum to stat
         }
         allMbr.insertBack(newEvent);
-        // in insertBack, new memory space is allocated
-        // but after insertion, new Event is not dangling
-        // since the new node created is /pointing to/ the newEvent!!!
-        // delete newEvent; is wrong
     }
 
     ////discrete event simulation
@@ -87,7 +77,7 @@ int main() {
             }
         }
         allMbr = allMbr_tmp; // this is the rest of the queue
-        while (!allMbr_tmp.isEmpty()) {
+        while (!allMbr_tmp.isEmpty()) { // deallocate the tmp queue
             delete allMbr_tmp.removeFront();
         }
 
@@ -95,11 +85,9 @@ int main() {
             Event *pTmp = platinumMbr.removeFront();
             if (pTmp->count > 0 && pTmp->count < pTmp->duration) {
                 pTmp->count++;
-                // if we use pCount, there will be double counting problems:
-                //
+                // if we use pCount, there will be double counting problems
                 platinumMbr_tmp.insertBack(pTmp);
             } else if (pTmp->count == pTmp->duration) {
-//                pCount = 0;
                 occupied = false;
                 delete pTmp;
             } else platinumMbr_tmp.insertBack(pTmp);
@@ -109,26 +97,12 @@ int main() {
             delete platinumMbr_tmp.removeFront();
         }
 
-//        if (!platinumMbr.isEmpty()) {
-//            Event *pTmp = platinumMbr.removeFront(); // we only care about the first element...
-//            if (pCount > 0 && pCount < pTmp->duration) {
-//                pCount++;
-//                platinumMbr.insertFront(pTmp);
-//            } else if (pCount == pTmp->duration) {
-//                pCount = 0;
-//                occupied = false;
-//                delete pTmp;
-//            }
-//        } // makes not a queue?
-
         while (!goldMbr.isEmpty()) {
             Event *gTmp = goldMbr.removeFront();
             if (gTmp->count > 0 && gTmp->count < gTmp->duration) {
-                // first answer count as 1, second tick count as 2, no problem
                 gTmp->count++;
                 goldMbr_tmp.insertBack(gTmp);
             } else if (gTmp->count == gTmp->duration) {
-//                gCount = 0;
                 occupied = false;
                 delete gTmp;
             } else goldMbr_tmp.insertBack(gTmp);
@@ -144,7 +118,6 @@ int main() {
                 sTmp->count++;
                 silverMbr_tmp.insertBack(sTmp);
             } else if (sTmp->count == sTmp->duration) {
-//                sCount = 0;
                 occupied = false;
                 delete sTmp;
             } else silverMbr_tmp.insertBack(sTmp);
@@ -160,7 +133,6 @@ int main() {
                 rTmp->count++;
                 regularMbr_tmp.insertBack(rTmp);
             } else if (rTmp->count == rTmp->duration) {
-//                rCount = 0;
                 occupied = false;
                 delete rTmp;
             } else regularMbr_tmp.insertBack(rTmp);
@@ -170,39 +142,7 @@ int main() {
             delete regularMbr_tmp.removeFront();
         }
 
-        // in !occupied: if count == 0, count++
-        // outside: if count > 0, continue to count++
-        // until count = duration, reset count as 0, occupied = false, destroy in waitList & member list
-
-        if (!occupied) { // once the call is answered, we can never go into this argument
-//            if (pCount == 0 && !platinumMbr.isEmpty()) { // think carefully: what if there are multiple platinum members?
-//                pCount++;
-//                occupied = true;
-//                Event *pTmp = platinumMbr.removeFront();
-//                cout << "Answering call from " << pTmp->name << endl;
-//                platinumMbr.insertFront(pTmp); // should not use this for a queue
-//            }
-//            else if (gCount == 0 && !goldMbr.isEmpty()) {
-//                gCount++;
-//                occupied = true;
-//                Event *gTmp = goldMbr.removeFront();
-//                cout << "Answering call from " << gTmp->name << endl;
-//                goldMbr.insertFront(gTmp);
-//            }
-//            else if (sCount == 0 && !silverMbr.isEmpty()) {
-//                sCount++;
-//                occupied = true;
-//                Event *sTmp = silverMbr.removeFront();
-//                cout << "Answering call from " << sTmp->name << endl;
-//                goldMbr.insertFront(sTmp);
-//            }
-//            else if (rCount == 0 && !regularMbr.isEmpty()) {
-//                rCount++;
-//                occupied = true;
-//                Event *rTmp = regularMbr.removeFront();
-//                cout << "Answering call from " << rTmp->name << endl;
-//                regularMbr.insertFront(rTmp);
-//            }
+        if (!occupied) { // intuitively, "if not occupied"
             if (!platinumMbr.isEmpty()) {
                 while (!platinumMbr.isEmpty()) {
                     Event *pTmp = platinumMbr.removeFront();
@@ -224,7 +164,7 @@ int main() {
                 while (!goldMbr.isEmpty()) {
                     Event *gTmp = goldMbr.removeFront();
                     if (!occupied && gTmp->count == 0) {
-                        gTmp->count++;
+                    	 gTmp->count++;
                         occupied = true;
                         cout << "Answering call from " << gTmp->name << endl;
                     }
